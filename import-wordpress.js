@@ -202,12 +202,16 @@ async function downloadImage(url, destPath) {
                 });
             } else {
                 file.close();
-                fs.unlinkSync(destPath);
+                if (fs.existsSync(destPath)) {
+                    fs.unlinkSync(destPath);
+                }
                 reject(new Error(`Failed to download image: ${response.statusCode}`));
             }
         }).on('error', (err) => {
             file.close();
-            fs.unlinkSync(destPath);
+            if (fs.existsSync(destPath)) {
+                fs.unlinkSync(destPath);
+            }
             reject(err);
         });
     });
@@ -408,15 +412,6 @@ const xmlFilePath = process.argv[2];
 
 if (!fs.existsSync(xmlFilePath)) {
     console.error(`Error: File not found: ${xmlFilePath}`);
-    process.exit(1);
-}
-
-// Check if xml2js is installed
-try {
-    await import('xml2js');
-} catch (error) {
-    console.error('Error: xml2js package is not installed.');
-    console.error('Please install it by running: npm install xml2js');
     process.exit(1);
 }
 
