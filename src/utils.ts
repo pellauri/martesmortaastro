@@ -7,6 +7,6 @@ import type { CollectionEntry } from 'astro:content';
 export async function getPublishedPosts(): Promise<CollectionEntry<'blog'>[]> {
 	const posts = await getCollection('blog');
 	return posts
-		.filter((post) => !post.data.draft && !post.slug.includes('_draft'))
+		.filter((post) => !post.data.draft)
 		.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 }
