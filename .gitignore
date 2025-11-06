@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# WordPress export files (keep these out of git)
+*.WordPress.*.xml
