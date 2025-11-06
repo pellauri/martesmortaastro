@@ -96,12 +96,13 @@ function stripHtmlTags(html) {
         text = text.replace(/<[^>]*>/g, '');
     } while (text !== prevText);
     
-    // Remove any remaining HTML entities
-    text = text.replace(/&lt;/g, '<')
+    // Decode HTML entities in the correct order
+    // Decode &amp; last to avoid double-decoding
+    text = text.replace(/&quot;/g, '"')
+               .replace(/&#039;/g, "'")
+               .replace(/&lt;/g, '<')
                .replace(/&gt;/g, '>')
-               .replace(/&amp;/g, '&')
-               .replace(/&quot;/g, '"')
-               .replace(/&#039;/g, "'");
+               .replace(/&amp;/g, '&');
     
     return text.trim();
 }
