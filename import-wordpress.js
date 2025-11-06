@@ -77,6 +77,36 @@ function formatDisplayDate(date) {
 }
 
 /**
+ * Safely strip HTML tags from content
+ * Performs multiple passes to ensure complete removal
+ */
+function stripHtmlTags(html) {
+    if (!html) return '';
+    
+    let text = html;
+    
+    // First pass: replace br and p tags with newlines
+    text = text.replace(/<br\s*\/?>\s*/gi, '\n');
+    text = text.replace(/<\/p>\s*/gi, '\n');
+    
+    // Multiple passes to ensure nested tags are removed
+    let prevText;
+    do {
+        prevText = text;
+        text = text.replace(/<[^>]*>/g, '');
+    } while (text !== prevText);
+    
+    // Remove any remaining HTML entities
+    text = text.replace(/&lt;/g, '<')
+               .replace(/&gt;/g, '>')
+               .replace(/&amp;/g, '&')
+               .replace(/&quot;/g, '"')
+               .replace(/&#039;/g, "'");
+    
+    return text.trim();
+}
+
+/**
  * Extract attendees from post content
  */
 function extractAttendees(content) {
@@ -87,7 +117,7 @@ function extractAttendees(content) {
     // First, extract text from <li> tags specifically
     const liMatches = content.matchAll(/<li[^>]*>(.*?)<\/li>/gi);
     for (const match of liMatches) {
-        let name = match[1].replace(/<[^>]*>/g, '').trim();
+        let name = stripHtmlTags(match[1]);
         if (name && name.length > 0 && name.length < 50) {
             attendees.push(name);
         }
@@ -99,11 +129,8 @@ function extractAttendees(content) {
     }
     
     // Otherwise, try other patterns
-    // Remove HTML tags but keep line breaks (convert br to single newline)
-    let text = content.replace(/<br\s*\/?>\s*/gi, '\n')
-                      .replace(/<\/p>\s*/gi, '\n')
-                      .replace(/<[^>]*>/g, '')
-                      .trim();
+    // Remove HTML tags but keep line breaks
+    let text = stripHtmlTags(content);
     
     // Look for section with "Asistentes" or similar
     // Look more broadly to capture all content between Asistentes and the next section
@@ -136,11 +163,8 @@ function extractAttendees(content) {
 function extractVenue(content) {
     if (!content) return 'Por determinar';
     
-    // Remove HTML tags but keep structure
-    let text = content.replace(/<br\s*\/?>/gi, '\n')
-                      .replace(/<\/p>/gi, '\n\n')
-                      .replace(/<[^>]*>/g, '')
-                      .trim();
+    // Remove HTML tags using the safe sanitization function
+    let text = stripHtmlTags(content);
     
     // Look for section with "Sede", "Lugar", "Local" etc.
     const sedeMatch = text.match(/(?:sede|lugar|local):?\s*([^\n]+)/i);
