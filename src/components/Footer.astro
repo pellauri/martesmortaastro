@@ -1,9 +1,10 @@
 ---
-const today = new Date();
+// Cache the year at build time instead of creating a new Date object on every render
+const currentYear = new Date().getFullYear();
 ---
 
 <footer>
-	&copy; {today.getFullYear()} Martes de Morta - La Vida
+	&copy; {currentYear} Martes de Morta - La Vida
 	<!-- <div class="social-links">
 		<a href="https://m.webtoo.ls/@astro" target="_blank">
 			<span class="sr-only">Follow Astro on Mastodon</span>
